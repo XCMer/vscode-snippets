@@ -122,10 +122,10 @@ func writeSnippets(snippets map[string][]SnippetInfo, snippetsWritePath string) 
 
 		for _, snippet := range folderSnippets {
 			// Prepare the various fields of the snippet
-			description, _ := snippet.Data["desc"].(string)
+			description := getStringOrDefault(snippet.Data["desc"], "")
 			snippetIdentifier := "vs/" + folderName + "/" + snippet.SnippetName
-			snippetScope := ""
-			snippetPrefix := "."
+			snippetScope := getStringOrDefault(snippet.Data["scope"], "")
+			snippetPrefix := getStringOrDefault(snippet.Data["prefix"], "")
 
 			// Create the snippetJSON object
 			snippetJson := SnippetJSON{
@@ -162,4 +162,13 @@ func pathExists(path string) bool {
 	}
 
 	return true
+}
+
+func getStringOrDefault(data interface{}, defaultValue string) string {
+	// If data is nil, return a blank string
+	if data == nil {
+		return defaultValue
+	}
+
+	return data.(string)
 }
