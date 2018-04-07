@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -41,9 +42,33 @@ func main() {
 }
 
 func loadConfig() Config {
+	// Look for config in the home directory and the current
+	// directory
+	viper.SetConfigName("vscode-snippets")
+	viper.AddConfigPath("$HOME")
+	viper.AddConfigPath(".")
+
+	// Read the config file
+	viper.SetConfigType("yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Error reading config file.\n%s\n\n"+
+			"Please create a config file (vscode-snippets.yaml) in your home directory", err))
+	}
+
+	sourcePath := viper.GetString("source_path")
+	if !pathExists(sourcePath) {
+		panic(fmt.Errorf("source_path not specified in config file"))
+	}
+
+	destPath := viper.GetString("dest_path")
+	if !pathExists(destPath) {
+		panic(fmt.Errorf("source_path not specified in config file"))
+	}
+
 	return Config{
-		SourcePath: "/Users/raahul/mysnippets",
-		DestPath:   "/Users/raahul/mysnippets_output",
+		SourcePath: sourcePath,
+		DestPath:   destPath,
 	}
 }
 
@@ -56,11 +81,6 @@ func loadSnippets(snippetsPath string, frontMatter *front.Matter) map[string][]S
 			return nil
 		}
 
-		// Ignore files that are not snippets
-		if filepath.Ext(path) != ".snippet" {
-			return nil
-		}
-
 		// Derive the folder name and snippet name from the snippet's
 		// relative path
 		//
@@ -69,6 +89,11 @@ func loadSnippets(snippetsPath string, frontMatter *front.Matter) map[string][]S
 		relPath, _ := filepath.Rel(snippetsPath, path)
 		dirName := filepath.Dir(relPath)
 		snippetName := filepath.Base(relPath)
+
+		// Ignore files that are not snippets
+		if strings.HasPrefix(snippetName, ".") {
+			return nil
+		}
 
 		// Read the snippet file and get the parsed results
 		contentBytes, _ := ioutil.ReadFile(path)
@@ -127,4 +152,14 @@ func writeSnippets(snippets map[string][]SnippetInfo, snippetsWritePath string) 
 		// Print it out
 		fmt.Println(filepath.Join(snippetsWritePath, jsonOutputFileName))
 	}
+}
+
+func pathExists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+
+	return true
 }
