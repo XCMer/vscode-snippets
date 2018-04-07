@@ -125,7 +125,7 @@ func writeSnippets(snippets map[string][]SnippetInfo, snippetsWritePath string) 
 			description := getStringOrDefault(snippet.Data["desc"], "")
 			snippetIdentifier := "vs/" + folderName + "/" + snippet.SnippetName
 			snippetScope := getStringOrDefault(snippet.Data["scope"], "")
-			snippetPrefix := getStringOrDefault(snippet.Data["prefix"], "")
+			snippetPrefix := getStringOrDefault(snippet.Data["prefix"], ".")
 
 			// Create the snippetJSON object
 			snippetJson := SnippetJSON{
@@ -142,7 +142,7 @@ func writeSnippets(snippets map[string][]SnippetInfo, snippetsWritePath string) 
 		jsonDataMarshalled, _ := json.MarshalIndent(jsonFileData, "", "  ")
 
 		// Write the file
-		jsonOutputFileName := folderName + ".code-snippets"
+		jsonOutputFileName := "vs-" + folderName + ".code-snippets"
 		ioutil.WriteFile(
 			filepath.Join(snippetsWritePath, jsonOutputFileName),
 			jsonDataMarshalled,
