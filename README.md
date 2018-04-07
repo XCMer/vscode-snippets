@@ -23,7 +23,7 @@ dest_path: "/Users/<USERNAME>/Library/Application Support/Code/User/snippets"
 
 The `source_path` can be arbitrary, while the `dest_path` has to be where VSCode stores its snippets. VSCode will hot-reload any file put into this directory.
 
-## Usage
+## Structuring your snippet directory
 
 The structure of your snippets directory should be as follows:
 
@@ -41,6 +41,10 @@ These are the conventions:
 1. Your snippet directory should consist of top-level folders. You can't directly put snippets here.
 1. The folder level can only be one level deep. Every folder in your snippet directory should directly contain snippet files, and can have any extension that would assist with syntax highlighting in your favorite editor.
 1. For every directory, vscode-snippets creates a snippet file in the target directory.
+
+## Running vscode-snippets
+
+Just run the `$GOPATH/bin/vscode-snippets` binary. It will pick up all snippets from your configured directory, and put it into the configured VSCode directory. If you have VSCode open, then you'll find that the changes reflect instantly.
 
 ## Format of the snippet file
 
